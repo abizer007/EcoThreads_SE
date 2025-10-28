@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Women's Fashion — EcoThreads</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-y..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* ===== Page-specific styles (showcase + small overrides) ===== */
+    body { font-family: "Inter", sans-serif; color: #111827; background:#f6f7f8; }
+    .muted { color:#6b7280; }
+    .btn { padding:8px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); background:white; cursor:pointer; }
+    .btn.outline { background: transparent; border:1px solid rgba(0,0,0,0.08); }
+    .site-header { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:18px 24px; background:white; box-shadow:0 2px 6px rgba(0,0,0,0.04); position:sticky; top:0; z-index:30; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand .leaf { font-size:22px; }
+    .brand-text .title { font-weight:700; font-size:18px; }
+    .brand-text .subtitle { font-size:12px; opacity:0.8; }
+    .site-nav .nav-link { margin-right:12px; text-decoration:none; color:#374151; font-weight:600; opacity:0.95; }
+    .site-nav .nav-link.active { color:#0f172a; border-bottom:2px solid #10a75a; padding-bottom:6px; }
+    .header-controls { display:flex; gap:12px; align-items:center; }
+    .search-box { display:flex; gap:6px; align-items:center; }
+    .search-box input { padding:8px 10px; border-radius:8px; border:1px solid #e6e7eb; min-width:220px; }
+
+    /* === Showcase (Women) styles (scoped to #category-showcase) === */
+    #category-showcase { background: linear-gradient(180deg,#fffaf8 0%, #ffffff 100%); padding-bottom:60px; color:#111827; margin-top:18px; border-radius:12px; }
+    #category-showcase h1 { font-size:2.4rem; font-weight:800; margin:24px 0 6px; text-align:center; }
+    #category-showcase p.subtext { text-align:center; color:#6b7280; font-size:1rem; margin-bottom:20px; }
+
+    .carousel { position:relative; width:100%; max-width:1200px; margin:0 auto 26px; overflow:hidden; border-radius:14px; box-shadow:0 10px 40px rgba(0,0,0,0.05); background:#111; }
+    .carousel-track { display:flex; transition: transform 0.6s ease-in-out; }
+    .carousel-slide { min-width:100%; position:relative; }
+    .carousel-slide img { width:100%; height:460px; object-fit:cover; border-radius:14px; display:block; }
+    .carousel-caption { position:absolute; bottom:40px; left:40px; color:white; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
+    .carousel-caption h2 { font-size:1.6rem; margin:0; }
+    .carousel-caption p { font-style:italic; font-size:1rem; margin-top:6px; }
+
+    .carousel-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; font-size:1.45rem; padding:6px 12px; border-radius:50%; cursor:pointer; transition:0.2s; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+    .carousel-btn:hover { transform:translateY(-50%) scale(1.04); }
+    .carousel-btn.prev { left:12px; }
+    .carousel-btn.next { right:12px; }
+
+    .product-grid { max-width:1200px; margin:18px auto 0; display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:18px; padding:0 20px 28px; }
+    .product-card { background:white; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.06); transition: transform .3s, box-shadow .3s; cursor:pointer; }
+    .product-card:hover { transform:translateY(-6px); box-shadow:0 10px 26px rgba(0,0,0,0.08); }
+    .product-card img { width:100%; height:300px; object-fit:cover; display:block; }
+    .product-info { padding:14px 18px; }
+    .product-info h3 { font-size:1.05rem; font-weight:700; margin-bottom:4px; color:#111827; }
+    .product-info p { margin:2px 0; color:#6b7280; font-size:0.9rem; }
+    .price { color:#10a75a; font-weight:700; margin-top:4px; display:block; }
+
+    /* === Supabase items styles === */
+    #itemsGrid { margin-top: 34px; display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:18px; }
+    .category-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 8px 18px rgba(0,0,0,0.04); cursor:pointer; transition:transform .18s; }
+    .category-card img { width:100%; height:220px; object-fit:cover; display:block; }
+    .card-meta { padding:10px 12px; }
+
+    @media (max-width:640px){
+      .carousel-slide img { height:280px; }
+      #category-showcase h1 { font-size:1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="leaf">🌿</div>
+      <div class="brand-text">
+        <div class="title">EcoThreads</div>
+        <div class="subtitle">Sustainable fashion</div>
+      </div>
+    </div>
+
+    <nav class="site-nav" aria-label="Primary">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="men.html" class="nav-link">Men's Fashion</a>
+      <a href="women.html" class="nav-link active">Women's Fashion</a>
+      <a href="kids.html" class="nav-link">Kids' Clothing</a>
+    </nav>
+
+    <div class="header-controls">
+      <div class="search-box">
+        <input id="searchInput" placeholder="Search within Women's Fashion...">
+        <button id="searchBtn" class="icon-btn btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+      <button id="authBtn" class="btn outline">Sign In</button>
+    </div>
+  </header>
+
+  <main style="max-width:1180px;margin:28px auto;padding:0 20px">
+    <!-- ===== Women Showcase (carousel + static grid) ===== -->
+    <section id="category-showcase" style="padding:0;">
+      <h1>Women's Fashion</h1>
+      <p class="subtext">Sustainably sourced women's clothing — dresses, tops, skirts, and accessories curated for style and longevity.</p>
+
+      <!-- Carousel -->
+      <div class="carousel" aria-roledescription="carousel">
+        <button class="carousel-btn prev" aria-label="Previous slide">❮</button>
+        <div class="carousel-track" role="list">
+          <div class="carousel-slide" role="listitem">
+            <img src="https://images.unsplash.com/photo-1551854838-9f7a0b8b4f86?q=80&w=1400&auto=format&fit=crop" alt="Elegant Dresses" />
+            <div class="carousel-caption">
+              <h2>Flowing Dresses</h2>
+              <p>Light, breathable & timeless</p>
+            </div>
+          </div>
+          <div class="carousel-slide" role="listitem">
+            <img src="https://images.unsplash.com/photo-1520975926670-2a7fcf2d6f29?q=80&w=1400&auto=format&fit=crop" alt="Boho Styles" />
+            <div class="carousel-caption">
+              <h2>Boho Chic</h2>
+              <p>Comfort with character</p>
+            </div>
+          </div>
+          <div class="carousel-slide" role="listitem">
+            <img src="https://images.unsplash.com/photo-1541832678-7f4a3f5b9b57?q=80&w=1400&auto=format&fit=crop" alt="Silk Collection" />
+            <div class="carousel-caption">
+              <h2>Everyday Silk</h2>
+              <p>Soft textures, lasting wear</p>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-btn next" aria-label="Next slide">❯</button>
+      </div>
+
+      <!-- Static Product Grid (showcase curated items) -->
+      <div class="product-grid" id="productGridWomen"></div>
+    </section>
+
+    <!-- ===== Supabase-driven dynamic grid (keeps original dynamic behavior) ===== -->
+    <section style="margin-top:24px;">
+      <h2 style="margin:12px 0 6px">All Items (Live)</h2>
+      <p class="muted" style="margin:0 0 12px">Live items from your Supabase `items` table (category filtered to Women).</p>
+
+      <div id="itemsGrid"></div>
+
+      <div style="text-align:center;margin-top:18px">
+        <button id="loadMore" class="btn outline">Load more</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" style="margin-top:28px;background:#0f172a;color:white;padding:22px 20px;border-radius:10px;max-width:1180px;margin-left:auto;margin-right:auto">
+    <div class="footer-inner" style="display:flex;gap:18px;justify-content:space-between;align-items:flex-start">
+      <div class="brand-col">
+        <div class="title white" style="font-weight:700;font-size:18px">EcoThreads</div>
+        <p class="muted" style="color:rgba(255,255,255,0.8);max-width:300px">Sustainable fashion marketplace.</p>
+      </div>
+      <div class="links-col" style="color:rgba(255,255,255,0.9);display:flex;gap:36px">
+        <div><strong>Shop</strong><br>Men's Fashion<br>Women's Fashion</div>
+        <div><strong>Sell</strong><br>List an item<br>Donation program</div>
+      </div>
+    </div>
+    <div class="footer-bottom muted" style="opacity:0.7;margin-top:14px">© 2025 EcoThreads. All rights reserved.</div>
+  </footer>
+
+  <!-- Supabase client (replace placeholders) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.js"></script>
+  <script>
+    // REPLACE with your values
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    window.supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+  </script>
+
+  <!-- Showcase carousel + static products script -->
+  <script>
+    (function(){
+      // Carousel logic
+      const track = document.querySelector("#category-showcase .carousel-track");
+      const slides = Array.from(track.children);
+      const nextBtn = document.querySelector("#category-showcase .carousel-btn.next");
+      const prevBtn = document.querySelector("#category-showcase .carousel-btn.prev");
+      let current = 0;
+      function update(){ track.style.transform = `translateX(-${current*100}%)`; }
+      nextBtn.addEventListener('click', ()=>{ current = (current+1) % slides.length; update(); });
+      prevBtn.addEventListener('click', ()=>{ current = (current-1+slides.length) % slides.length; update(); });
+      let autoplay = setInterval(()=>{ current = (current+1) % slides.length; update(); }, 5000);
+      const carouselEl = document.querySelector('#category-showcase .carousel');
+      carouselEl.addEventListener('mouseover', ()=> clearInterval(autoplay));
+      carouselEl.addEventListener('mouseleave', ()=> { autoplay = setInterval(()=>{ current = (current+1) % slides.length; update(); }, 5000); });
+
+      // Static women products
+      const womenProducts = [
+        { name: "Floral Maxi Dress", category: "Dresses", price: "₹1,899", img: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=800&auto=format&fit=crop" },
+        { name: "Silk Wrap Top", category: "Tops", price: "₹1,299", img: "https://images.unsplash.com/photo-1520975912689-2f7dcb582c1b?q=80&w=800&auto=format&fit=crop" },
+        { name: "Denim Midi Skirt", category: "Skirts", price: "₹1,099", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop" },
+        { name: "Handloom Saree", category: "Ethnic", price: "₹3,499", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=800&auto=format&fit=crop" }
+      ];
+
+      // Render product cards
+      const grid = document.getElementById("productGridWomen");
+      womenProducts.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}">
+          <div class="product-info">
+            <h3>${p.name}</h3>
+            <p>${p.category}</p>
+            <span class="price">${p.price}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    })();
+  </script>
+
+  <!-- Supabase-powered items script (adapted to coexist) -->
+  <script>
+    (function(){
+      const supabaseClient = window.supabaseClient;
+      const itemsGrid = document.getElementById('itemsGrid');
+      const loadMoreBtn = document.getElementById('loadMore');
+      const searchInput = document.getElementById('searchInput');
+      const searchBtn = document.getElementById('searchBtn');
+
+      if(!supabaseClient){
+        itemsGrid.innerHTML = '<div style="grid-column:1/-1;padding:24px;background:#fff;border-radius:12px;box-shadow:var(--shadow)">Supabase not configured — replace keys in this file.</div>';
+        loadMoreBtn.style.display='none';
+        document.getElementById('authBtn').onclick = ()=> alert('Supabase not configured.');
+        return;
+      }
+
+      let page = 0;
+      const PAGE_SIZE = 9;
+
+      async function loadItems(reset=false, q=''){
+        if(reset){ page = 0; itemsGrid.innerHTML = ''; }
+        const from = page * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+
+        try{
+          let query = supabaseClient
+            .from('items')
+            .select('*')
+            .order('created_at',{ascending:false})
+            .range(from,to);
+
+          // filter where category contains 'Women' case-insensitive
+          query = query.ilike('category','%Women%');
+
+          if(q && q.length>0){
+            query = query.ilike('title', `%${q}%`);
+          }
+
+          const { data, error } = await query;
+          if(error){ console.error('load items err',error); if(from===0) itemsGrid.innerHTML='<div class="muted">Failed to load items</div>'; return; }
+          if(!data || data.length===0){
+            if(from===0) itemsGrid.innerHTML = '<div style="grid-column:1/-1;padding:18px;background:#fff;border-radius:10px;box-shadow:var(--shadow);text-align:center">No items found in this category.</div>';
+            loadMoreBtn.style.display='none';
+            return;
+          }
+
+          data.forEach(renderItemCard);
+          if(data.length < PAGE_SIZE){ loadMoreBtn.style.display='none'; } else { loadMoreBtn.style.display='inline-block'; }
+          page++;
+        }catch(e){ console.error(e); }
+      }
+
+      function renderItemCard(item){
+        const wrapper = document.createElement('article');
+        wrapper.className = 'category-card';
+        wrapper.style.height = '320px';
+
+        const imgSrc = Array.isArray(item.photos) && item.photos.length>0 ? item.photos[0] : 'https://via.placeholder.com/800x800?text=No+Image';
+        wrapper.innerHTML = `
+          <img src="${imgSrc}" alt="${escapeHtml(item.title || 'Item')}">
+          <div class="card-meta">
+            <div style="font-size:16px">${escapeHtml(item.title || 'Untitled')}</div>
+            <div style="font-weight:600;font-size:13px;opacity:0.95">₹ ${item.price ? Number(item.price).toFixed(0) : '0'}</div>
+          </div>
+        `;
+
+        wrapper.addEventListener('click', ()=> {
+          localStorage.setItem('ecothreads:lastViewedItem', item.id);
+          window.location.href = `item.html?id=${item.id}`;
+        });
+
+        itemsGrid.appendChild(wrapper);
+      }
+
+      function escapeHtml(str){
+        if(!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+      }
+
+      loadMoreBtn.addEventListener('click', ()=> loadItems(false));
+      searchBtn.addEventListener('click', ()=>{ const q = (searchInput.value||'').trim(); loadItems(true, q); });
+
+      // initial load
+      loadItems(true);
+
+      // auth UI
+      async function updateAuthUI(){
+        try{
+          const r = await supabaseClient.auth.getUser();
+          const user = r.data ? r.data.user : null;
+          const btn = document.getElementById('authBtn');
+          if(user){ btn.textContent = 'Sign Out'; btn.onclick = async ()=>{ await supabaseClient.auth.signOut(); location.reload(); }; }
+          else { btn.textContent = 'Sign In'; btn.onclick = ()=> location.href='index.html'; }
+        }catch(e){ console.error(e); }
+      }
+      updateAuthUI();
+
+    })();
+  </script>
+</body>
+</html>
