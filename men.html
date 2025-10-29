@@ -133,8 +133,30 @@
       transform: translateY(-6px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     }
+    /* product card image sizing & fallback appearance */
+    .product-card img {
+      width: 100%;
+      height: 300px;        /* choose height that matches your card */
+      display: block;
+      object-fit: cover;    /* fills the container and crops nicely */
+      object-position: center; /* center the crop */
+      background: #f3f4f6;  /* subtle background while loading */
+    }
 
-    .product-card img { width:100%; height:300px; object-fit:cover; display:block; }
+    /* optional: small smoothing to avoid reflow when image fails */
+    .product-card .img-placeholder {
+      width:100%;
+      height:300px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      color:#9ca3af;
+      background:#f8fafc;
+    }
+
+
+    
     .product-info { padding:12px 14px; }
     .product-info h3 { font-size:1.02rem; margin:0 0 6px; color:#111827; font-weight:700; }
     .product-info p { margin:0; color:#6b7280; font-size:0.9rem; }
@@ -384,23 +406,70 @@
             <div style="font-weight:600;font-size:13px;opacity:0.95">₹ ${item.price ? Number(item.price).toFixed(0) : '0'}</div>
           </div>
         `;
+      const PLACEHOLDER = "https://via.placeholder.com/800x600?text=No+Image";
+      // render product cards (creates <img> element so we can attach error handler)
+      (function renderProducts(){
+        const grid = document.getElementById("productGrid"); // or productGridWomen / productGridKids as needed
+        if(!grid) return;
+        products.forEach(p => {
+          const card = document.createElement("div");
+          card.className = "product-card";
 
-        wrapper.addEventListener('click', ()=> {
-          localStorage.setItem('ecothreads:lastViewedItem', item.id);
-          window.location.href = `item.html?id=${item.id}`;
+          // create image element separately to attach error handler
+          const imgEl = document.createElement("img");
+          imgEl.src = p.img;
+          imgEl.alt = p.name || "Product image";
+
+          // if image fails to load, swap to placeholder (and avoid infinite loop)
+          imgEl.onerror = function(){
+            if (this.dataset.fallback) return; // already tried fallback
+            this.dataset.fallback = "1";
+            this.src = PLACEHOLDER;
+          };
+
+          // create info container
+          const info = document.createElement("div");
+          info.className = "product-info";
+          info.innerHTML = `<h3>${escapeHtml(p.name)}</h3>
+                            <p>${escapeHtml(p.category)}</p>
+                            <span class="price">${escapeHtml(p.price)}</span>`;
+
+          // assemble card
+          card.appendChild(imgEl);
+          card.appendChild(info);
+
+          // optional: click to open detail or enlarge
+          card.addEventListener('click', () => {
+            // example: open a simple lightbox or item page
+            // window.location.href = `item.html?name=${encodeURIComponent(p.name)}`;
+          });
+
+          grid.appendChild(card);
         });
+      })();
 
-        itemsGrid.appendChild(wrapper);
-      }
-
+      // small helper: same escapeHtml used elsewhere
       function escapeHtml(str){
         if(!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
           .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
       }
+            wrapper.addEventListener('click', ()=> {
+              localStorage.setItem('ecothreads:lastViewedItem', item.id);
+              window.location.href = `item.html?id=${item.id}`;
+            });
 
-      loadMoreBtn.addEventListener('click', ()=> loadItems(false));
-      searchBtn.addEventListener('click', ()=>{ const q = (searchInput.value||'').trim(); loadItems(true, q); });
+            itemsGrid.appendChild(wrapper);
+          }
+
+          function escapeHtml(str){
+            if(!str) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+          }
+
+          loadMoreBtn.addEventListener('click', ()=> loadItems(false));
+          searchBtn.addEventListener('click', ()=>{ const q = (searchInput.value||'').trim(); loadItems(true, q); });
 
       // initial load
       loadItems(true);
