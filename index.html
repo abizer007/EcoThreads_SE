@@ -398,7 +398,8 @@
             const uResp = await supabaseClient.auth.getUser();
             const user = uResp && uResp.data ? uResp.data.user : null;
             if (!user) {
-              alert('Please sign in to list or donate an item.'); // you can open modal here
+              // Open modal to ask user to sign in
+              openAuthModal('signin', 'You need to sign in to list or donate an item.');
               submitBtn.disabled = false;
               submitBtn.textContent = origText;
               return;
@@ -515,30 +516,32 @@
   </footer>
 
   <!-- AUTH MODAL -->
-  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal-head">
-        <h3 id="modalTitle">Welcome to EcoThreads</h3>
-        <button id="closeModal" aria-label="Close" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="background:#fff;border-radius:12px;padding:18px;width:420px;max-width:95%;">
+      <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 id="modalTitle" style="margin:0">Welcome to EcoThreads</h3>
+        <button id="closeModal" aria-label="Close" class="icon-btn" style="background:transparent;border:0;font-size:18px;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div class="modal-tabs">
-        <button id="tabSignIn" class="tab active">Sign In</button>
-        <button id="tabSignUp" class="tab">Sign Up</button>
+      <div class="modal-tabs" style="display:flex;gap:8px;margin-bottom:12px">
+        <button id="tabSignIn" class="tab active" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#f7f7f7;cursor:pointer">Sign In</button>
+        <button id="tabSignUp" class="tab" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff;cursor:pointer">Sign Up</button>
       </div>
 
       <div id="authForms">
         <div id="signInForm">
-          <input id="signinEmail" class="field" placeholder="Email">
-          <input id="signinPassword" type="password" class="field" placeholder="Password">
-          <button id="btnSignIn" class="btn primary">Sign In</button>
+          <input id="signinEmail" class="field" placeholder="Email" style="width:100%;margin-bottom:8px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08)">
+          <input id="signinPassword" type="password" class="field" placeholder="Password" style="width:100%;margin-bottom:8px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08)">
+          <button id="btnSignIn" class="btn primary" style="width:100%;padding:10px;border-radius:8px">Sign In</button>
         </div>
 
         <div id="signUpForm" style="display:none;">
-          <input id="signupEmail" class="field" placeholder="Email">
-          <input id="signupPassword" type="password" class="field" placeholder="Password">
-          <button id="btnSignUp" class="btn primary">Create Account</button>
+          <input id="signupEmail" class="field" placeholder="Email" style="width:100%;margin-bottom:8px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08)">
+          <input id="signupPassword" type="password" class="field" placeholder="Password" style="width:100%;margin-bottom:8px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08)">
+          <button id="btnSignUp" class="btn primary" style="width:100%;padding:10px;border-radius:8px">Create Account</button>
         </div>
+
+        <div id="authMessage" style="margin-top:10px;color:#6b7280;font-size:13px"></div>
       </div>
     </div>
   </div>
@@ -553,6 +556,217 @@
     // use window.supabase (UMD) to create client instance
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
+
+  <!-- ========== Added small auth & navigation wiring script ========== -->
+  <script>
+    (function () {
+      // Elements for nav/hero actions
+      const openSellBtn = document.getElementById('openSell');
+      const startShopBtn = document.getElementById('startShop');
+      const categoriesSection = document.getElementById('categories');
+      const sellSection = document.getElementById('sell');
+      const authBtn = document.getElementById('authBtn');
+
+      // Modal & auth elements
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const closeModalBtn = document.getElementById('closeModal');
+      const tabSignIn = document.getElementById('tabSignIn');
+      const tabSignUp = document.getElementById('tabSignUp');
+      const signInForm = document.getElementById('signInForm');
+      const signUpForm = document.getElementById('signUpForm');
+      const btnSignIn = document.getElementById('btnSignIn');
+      const btnSignUp = document.getElementById('btnSignUp');
+      const signinEmail = document.getElementById('signinEmail');
+      const signinPassword = document.getElementById('signinPassword');
+      const signupEmail = document.getElementById('signupEmail');
+      const signupPassword = document.getElementById('signupPassword');
+      const authMessageEl = document.getElementById('authMessage');
+
+      const supabase = window.supabaseClient;
+
+      // Utility: show modal and choose tab
+      window.openAuthModal = function (tab = 'signin', message = '') {
+        authMessageEl.textContent = message || '';
+        modalBackdrop.style.display = 'flex';
+        if (tab === 'signup') {
+          showSignUp();
+        } else {
+          showSignIn();
+        }
+        // focus first input
+        setTimeout(() => {
+          if (tab === 'signup') signupEmail.focus(); else signinEmail.focus();
+        }, 150);
+      };
+
+      function closeAuthModal() {
+        modalBackdrop.style.display = 'none';
+        authMessageEl.textContent = '';
+      }
+
+      function showSignIn() {
+        tabSignIn.classList.add('active');
+        tabSignUp.classList.remove('active');
+        signInForm.style.display = 'block';
+        signUpForm.style.display = 'none';
+      }
+
+      function showSignUp() {
+        tabSignUp.classList.add('active');
+        tabSignIn.classList.remove('active');
+        signUpForm.style.display = 'block';
+        signInForm.style.display = 'none';
+      }
+
+      tabSignIn.addEventListener('click', showSignIn);
+      tabSignUp.addEventListener('click', showSignUp);
+      closeModalBtn.addEventListener('click', closeAuthModal);
+      modalBackdrop.addEventListener('click', function (e) {
+        if (e.target === modalBackdrop) closeAuthModal();
+      });
+
+      // Auth button behavior: open modal if not signed in; if signed in, sign out
+      authBtn.addEventListener('click', async function () {
+        const { data } = await supabase.auth.getUser();
+        const user = data ? data.user : null;
+        if (!user) {
+          openAuthModal('signin');
+        } else {
+          // signed in -> sign out
+          const ok = confirm('Sign out from EcoThreads?');
+          if (!ok) return;
+          await supabase.auth.signOut();
+          updateAuthUI(null);
+          alert('Signed out.');
+        }
+      });
+
+      // Sign up flow
+      btnSignUp.addEventListener('click', async function () {
+        const email = (signupEmail.value || '').trim();
+        const password = (signupPassword.value || '').trim();
+        if (!email || !password) {
+          authMessageEl.textContent = 'Enter email and password to create account.';
+          return;
+        }
+        btnSignUp.disabled = true;
+        authMessageEl.textContent = 'Creating account...';
+        try {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          // For many Supabase projects signUp triggers email confirmation; show message
+          authMessageEl.textContent = 'Account created. Please check your email to confirm (if required). Signing you in...';
+          // Try to sign in automatically
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInError) {
+            authMessageEl.textContent = 'Account created. Please confirm your email if prompted.';
+          } else {
+            updateAuthUI(signInData.user || null);
+            closeAuthModal();
+            alert('Welcome! You are signed in.');
+          }
+        } catch (err) {
+          console.error(err);
+          authMessageEl.textContent = err.message || 'Sign up failed.';
+        } finally {
+          btnSignUp.disabled = false;
+        }
+      });
+
+      // Sign in flow
+      btnSignIn.addEventListener('click', async function () {
+        const email = (signinEmail.value || '').trim();
+        const password = (signinPassword.value || '').trim();
+        if (!email || !password) {
+          authMessageEl.textContent = 'Enter your email and password.';
+          return;
+        }
+        btnSignIn.disabled = true;
+        authMessageEl.textContent = 'Signing in...';
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          updateAuthUI(data.user || null);
+          closeAuthModal();
+          alert('Signed in successfully.');
+        } catch (err) {
+          console.error(err);
+          authMessageEl.textContent = err.message || 'Sign in failed.';
+        } finally {
+          btnSignIn.disabled = false;
+        }
+      });
+
+      // Keep UI in sync with auth state
+      async function checkCurrentUser() {
+        const { data } = await supabase.auth.getUser();
+        const user = data ? data.user : null;
+        updateAuthUI(user);
+      }
+
+      function updateAuthUI(user) {
+        if (user) {
+          authBtn.textContent = 'Sign Out';
+          authBtn.title = 'Signed in as ' + (user.email || user.id);
+        } else {
+          authBtn.textContent = 'Sign In';
+          authBtn.title = 'Sign in to your account';
+        }
+      }
+
+      // subscribe to auth changes and update UI
+      if (supabase && supabase.auth && supabase.auth.onAuthStateChange) {
+        supabase.auth.onAuthStateChange((event, session) => {
+          const user = session && session.user ? session.user : null;
+          updateAuthUI(user);
+        });
+      }
+
+      // initial check
+      checkCurrentUser();
+
+      // hero buttons: scroll and optionally open modal
+      startShopBtn && startShopBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (categoriesSection) categoriesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      openSellBtn && openSellBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        if (sellSection) sellSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // If user not signed in, open modal to prompt sign-in
+        const { data } = await supabase.auth.getUser();
+        const user = data ? data.user : null;
+        if (!user) {
+          // small delay so scroll finishes visually then show modal
+          setTimeout(() => openAuthModal('signin', 'Sign in to list or donate an item.'), 500);
+        } else {
+          // user signed in — focus title input for quick listing
+          setTimeout(() => {
+            const titleEl = document.getElementById('title');
+            if (titleEl) titleEl.focus();
+          }, 400);
+        }
+      });
+
+      // If user tries to submit while not signed in, our existing form code will open the modal.
+      // But to be safe - intercept clicks on submit and ensure modal shows if not authenticated
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', async function (e) {
+          const { data } = await supabase.auth.getUser();
+          const user = data ? data.user : null;
+          if (!user) {
+            e.preventDefault();
+            openAuthModal('signin', 'Please sign in to continue listing or donating.');
+          }
+        }, { capture: true });
+      }
+
+    })();
+  </script>
+  <!-- ========== End added script ========== -->
 
   <script src="app.js" defer></script>
 </body>
